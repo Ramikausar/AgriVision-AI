@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% if scan_type == 'fruit' %}Fruit{% else %}Plant{% endif %} Analysis Result - PlantCare AI</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;800&family=Space+Grotesk:wght@500;700&display=swap"
+        rel="stylesheet">
+    {% if scan_type == 'fruit' %}
+    <style>
+        :root {
+            --primary: #38BDF8; /* Neon Blue */
+            --primary-glow: #0284c7;
+            --secondary: #FB7185; /* Neon Rose */
+            --border-glow: rgba(56, 189, 248, 0.3);
+        }
+        body {
+            background:
+                radial-gradient(circle at 15% 50%, rgba(56, 189, 248, 0.08) 0%, transparent 40%),
+                radial-gradient(circle at 85% 30%, rgba(251, 113, 133, 0.08) 0%, transparent 40%),
+                #0B0F19;
+        }
+    </style>
+    {% endif %}
+</head>
+
+<body>
+
+    <nav class="animate-up">
+        <a href="{{ url_for('home') }}" class="logo" style="text-decoration: none; font-family: 'Outfit', sans-serif; font-size: 1.5rem; font-weight: 800; letter-spacing: -0.5px; background: linear-gradient(135deg, #10b981, #38bdf8); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">
+            🌿 PlantCare <span style="-webkit-text-fill-color: #fff;">AI</span>
+        </a>
+        <ul class="nav-links">
+            <li><a href="{{ url_for('home') }}">Home</a></li>
+            <li><a href="{{ url_for('team') }}">About Us</a></li>
+            <li><a href="{{ url_for('map_page') }}">Crop Map</a></li>
+            <li><a href="{{ url_for('upload') }}" class="active">Diagnose</a></li>
+        </ul>
+    </nav>
+
+    <main>
+        <div class="result-dashboard animate-up delay-1">
+             <div class="result-image-box animate-right delay-2">
+                <img src="{{ url_for('static', filename='uploads/' + image_file) }}" alt="{% if scan_type == 'fruit' %}Analyzed Fruit{% else %}Analyzed Leaf{% endif %}">
+            </div>
+
+            <div class="result-details delay-3">
+                <div class="result-label" style="color: var(--primary);">{% if scan_type == 'fruit' %}Fruit / Crop{% else %}Plant{% endif %} Identified</div>
+                <h2 style="font-size: 2rem; color: #fff; margin-bottom: 2.5rem; font-family: 'Space Grotesk';">{{
+                    plant_type }}</h2>
+
+                <div class="result-label" style="color: var(--secondary);">Diagnosis</div>
+                <h2 class="disease-name glow-text">{{ disease_name }}</h2>
+
+                <div class="result-label"
+                    style="display: flex; justify-content: space-between; align-items: flex-end; margin-top: 1rem;">
+                    <span style="color: #fff;">AI Confidence Network Score</span>
+                    <span
+                        style="color: var(--primary); font-family: 'Space Grotesk'; font-weight: 800; font-size: 2rem; text-shadow: 0 0 15px rgba(16,185,129,0.5);">{{
+                        confidence }}%</span>
+                </div>
+
+                <div class="confidence-bar">
+                    <div class="confidence-fill" style="width: {{ confidence }}%;"></div>
+                </div>
+
+                {% if cause and cause != "No disease detected" %}
+                <div class="result-label" style="margin-bottom: 0.5rem; color: #ffb347;">How This Disease Starts</div>
+                <div class="recommendation-box cause-box">
+                    <p>{{ cause }}</p>
+                </div>
+
+                <div class="result-label" style="margin-bottom: 0.5rem; color: #4fc3f7;">Prevention (Stop It Before It Starts)</div>
+                <div class="recommendation-box prevention-box">
+                    <p>{{ prevention }}</p>
+                </div>
+
+                <div class="result-label" style="margin-bottom: 0.5rem; color: #81c784;">Treatment (Stop the Spread)</div>
+                <div class="recommendation-box treatment-box">
+                    <p>{{ treatment }}</p>
+                </div>
+                {% else %}
+                <div class="result-label" style="margin-bottom: 1.5rem; color: #81c784;">Recommendation</div>
+                <div class="recommendation-box">
+                    <p>{{ treatment }}</p>
+                </div>
+                {% endif %}
+
+                <a href="{{ url_for('upload') }}" class="btn-primary"
+                    style="text-align: center; width: 100%; font-size: 1.2rem; padding: 1.2rem;">Analyze New Subject</a>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // Animate confidence bar on load
+        document.addEventListener("DOMContentLoaded", function () {
+            const bar = document.querySelector('.confidence-fill');
+            const targetWidth = bar.style.width;
+            bar.style.width = '0%';
+            setTimeout(() => {
+                bar.style.width = targetWidth;
+            }, 500);
+        });
+    </script>
+
+    <script src="{{ url_for('static', filename='leaves.js') }}"></script>
+</body>
+
+</html>

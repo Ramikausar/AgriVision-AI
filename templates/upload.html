@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Diagnose Image - PlantCare AI</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;800&family=Space+Grotesk:wght@500;700&display=swap"
+        rel="stylesheet">
+    <script>
+        let activeStream = null;
+
+        function switchMode(mode) {
+            const plantBtn = document.getElementById('mode-plant');
+            const fruitBtn = document.getElementById('mode-fruit');
+            const scanTypeInput = document.getElementById('scan_type');
+            const scannerTitle = document.getElementById('scanner-title');
+            const scannerDesc = document.getElementById('scanner-desc');
+            const dropPromptTitle = document.getElementById('drop-prompt-title');
+            const uploadIcon = document.getElementById('upload-icon-symbol');
+            
+            if (scanTypeInput) scanTypeInput.value = mode;
+            
+            if (mode === 'plant') {
+                // Set CSS variables
+                document.documentElement.style.setProperty('--primary', '#10B981');
+                document.documentElement.style.setProperty('--primary-glow', '#059669');
+                document.documentElement.style.setProperty('--secondary', '#38BDF8');
+                
+                // Update buttons
+                plantBtn.style.background = 'linear-gradient(135deg, var(--primary), var(--primary-glow))';
+                plantBtn.style.color = '#000';
+                plantBtn.style.fontWeight = '700';
+                
+                fruitBtn.style.background = 'transparent';
+                fruitBtn.style.color = 'var(--text-light)';
+                fruitBtn.style.fontWeight = '600';
+                
+                // Update copy
+                scannerTitle.innerHTML = 'AI Plant <span class="glow-text">Scanner</span>';
+                scannerDesc.textContent = 'Upload a leaf photo or scan directly with your device camera.';
+                dropPromptTitle.textContent = 'Drag & Drop or Click to Upload Leaf Image';
+                uploadIcon.textContent = '🌿';
+            } else {
+                // Set CSS variables for Fruit (Blue/Rose)
+                document.documentElement.style.setProperty('--primary', '#38BDF8');
+                document.documentElement.style.setProperty('--primary-glow', '#0284c7');
+                document.documentElement.style.setProperty('--secondary', '#FB7185');
+                
+                // Update buttons
+                fruitBtn.style.background = 'linear-gradient(135deg, var(--primary), var(--primary-glow))';
+                fruitBtn.style.color = '#000';
+                fruitBtn.style.fontWeight = '700';
+                
+                plantBtn.style.background = 'transparent';
+                plantBtn.style.color = 'var(--text-light)';
+                plantBtn.style.fontWeight = '600';
+                
+                // Update copy
+                scannerTitle.innerHTML = 'AI Fruit <span class="glow-text">Scanner</span>';
+                scannerDesc.textContent = 'Upload a fruit photo or scan directly with your device camera.';
+                dropPromptTitle.textContent = 'Drag & Drop or Click to Upload Fruit Image';
+                uploadIcon.textContent = '🍎';
+            }
+        }
+
+        function renderPreview(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function (e) {
+                    document.getElementById('image-preview').src = e.target.result;
+                    document.getElementById('preview-container').style.display = 'block';
+                    document.getElementById('upload-prompt').style.display = 'none';
+                    document.getElementById('camera-container').style.display = 'none';
+                    document.querySelector('.btn-primary[type="submit"]').style.display = 'inline-block';
+                    document.querySelector('.upload-area').style.padding = '2rem';
+                }
+                reader.readAsDataURL(file);
+            }
+        }
+
+        function submitForm() {
+            document.getElementById('submitBtn').style.display = 'none';
+            document.getElementById('loader').style.display = 'flex';
+        }
+
+        function handleAreaClick() {
+            // Only trigger file picker if the camera isn't actively displaying
+            const cameraContainer = document.getElementById('camera-container');
+            if (cameraContainer.style.display !== 'block') {
+                document.getElementById('file').click();
+            }
+        }
+
+        function startCamera() {
+            const video = document.getElementById('camera-stream');
+            const cameraContainer = document.getElementById('camera-container');
+            const uploadPrompt = document.getElementById('upload-prompt');
+            const previewContainer = document.getElementById('preview-container');
+            
+            // Hide preview and prompt
+            previewContainer.style.display = 'none';
+            uploadPrompt.style.display = 'none';
+            document.querySelector('.btn-primary[type="submit"]').style.display = 'none';
+            
+            // Show camera stream
+            cameraContainer.style.display = 'block';
+
+            navigator.mediaDevices.getUserMedia({
+                video: {
+                    facingMode: 'environment', // Prefer rear camera on mobile
+                    width: { ideal: 1280 },
+                    height: { ideal: 720 }
+                },
+                audio: false
+            })
+            .then(stream => {
+                activeStream = stream;
+                video.srcObject = stream;
+            })
+            .catch(err => {
+                console.error("Camera access error:", err);
+                alert("Could not access camera. Please check permissions or ensure your device has an active camera.");
+                stopCamera();
+            });
+        }
+
+        function stopCamera(event) {
+            if (event) event.stopPropagation();
+            
+            const cameraContainer = document.getElementById('camera-container');
+            const uploadPrompt = document.getElementById('upload-prompt');
+            const video = document.getElementById('camera-stream');
+
+            if (activeStream) {
+                activeStream.getTracks().forEach(track => track.stop());
+                activeStream = null;
+            }
+            video.srcObject = null;
+            cameraContainer.style.display = 'none';
+            
+            // Restore preview if there was already an image loaded
+            const previewImg = document.getElementById('image-preview');
+            if (previewImg.src && previewImg.src !== window.location.href && !previewImg.src.endsWith('#')) {
+                document.getElementById('preview-container').style.display = 'block';
+                document.querySelector('.btn-primary[type="submit"]').style.display = 'inline-block';
+            } else {
+                uploadPrompt.style.display = 'block';
+            }
+        }
+
+        function capturePhoto(event) {
+            if (event) event.stopPropagation();
+            
+            const video = document.getElementById('camera-stream');
+            if (!video.srcObject) return;
+
+            // Capture the current frame using an offscreen canvas
+            const canvas = document.createElement('canvas');
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+            const ctx = canvas.getContext('2d');
+            
+            ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+            
+            // Convert canvas frame to a file blob
+            canvas.toBlob(blob => {
+                const file = new File([blob], "camera_capture.png", { type: "image/png" });
+                
+                // Inject the file into the existing HTML form input
+                const dataTransfer = new DataTransfer();
+                dataTransfer.items.add(file);
+                document.getElementById('file').files = dataTransfer.files;
+                
+                // Load preview
+                const previewImg = document.getElementById('image-preview');
+                previewImg.src = canvas.toDataURL('image/png');
+                
+                stopCamera();
+                
+                // Update UI layout
+                document.getElementById('preview-container').style.display = 'block';
+                document.querySelector('.btn-primary[type="submit"]').style.display = 'inline-block';
+                document.getElementById('upload-prompt').style.display = 'none';
+                document.querySelector('.upload-area').style.padding = '2rem';
+            }, 'image/png');
+        }
+    </script>
+</head>
+
+<body>
+
+    <nav class="animate-up">
+        <a href="{{ url_for('home') }}" class="logo" style="text-decoration: none; font-family: 'Outfit', sans-serif; font-size: 1.5rem; font-weight: 800; letter-spacing: -0.5px; background: linear-gradient(135deg, #10b981, #38bdf8); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">
+            🌿 PlantCare <span style="-webkit-text-fill-color: #fff;">AI</span>
+        </a>
+        <ul class="nav-links">
+            <li><a href="{{ url_for('home') }}">Home</a></li>
+            <li><a href="{{ url_for('team') }}">About Us</a></li>
+            <li><a href="{{ url_for('map_page') }}">Crop Map</a></li>
+            <li><a href="{{ url_for('upload') }}" class="active">Diagnose</a></li>
+        </ul>
+    </nav>
+
+    <main class="upload-wrapper">
+        <div class="upload-container animate-up delay-1">
+            <h2 id="scanner-title" style="font-size: 3.5rem; margin-bottom: 1rem; color: #fff;">AI Plant <span
+                    class="glow-text">Scanner</span></h2>
+            <p id="scanner-desc" style="color: var(--text-light); margin-bottom: 1.5rem; font-size: 1.2rem;">Upload a leaf photo or scan directly with your device camera.</p>
+
+            <!-- Mode Switcher -->
+            <div class="mode-switcher-container" style="display: flex; justify-content: center; margin-bottom: 2.5rem;">
+                <div class="mode-switcher" style="display: inline-flex; background: rgba(255, 255, 255, 0.03); padding: 0.35rem; border-radius: 30px; border: 1px solid rgba(255, 255, 255, 0.08); box-shadow: 0 4px 20px rgba(0,0,0,0.2); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);">
+                    <button type="button" id="mode-plant" class="mode-btn active" onclick="switchMode('plant')" style="background: linear-gradient(135deg, var(--primary), var(--primary-glow)); color: #000; border: none; padding: 0.6rem 2rem; border-radius: 25px; font-weight: 700; font-size: 1rem; cursor: pointer; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); display: flex; align-items: center; gap: 8px;">
+                        🌿 Plant Leaf
+                    </button>
+                    <button type="button" id="mode-fruit" class="mode-btn" onclick="switchMode('fruit')" style="background: transparent; color: var(--text-light); border: none; padding: 0.6rem 2rem; border-radius: 25px; font-weight: 600; font-size: 1rem; cursor: pointer; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); display: flex; align-items: center; gap: 8px;">
+                        🍎 Fruit / Crop
+                    </button>
+                </div>
+            </div>
+ 
+            <div class="upload-actions" style="display: flex; gap: 1.5rem; justify-content: center; margin-bottom: 2.2rem;">
+                <button type="button" class="btn-primary" onclick="document.getElementById('file').click()" style="background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.15); color: #fff; border-radius: 16px; font-size: 1.1rem; padding: 0.9rem 2rem;">
+                    📁 Browse File
+                </button>
+                <button type="button" class="btn-primary" id="openCameraBtn" onclick="startCamera()" style="background: linear-gradient(135deg, var(--secondary), var(--primary-glow)); color: #fff; border-radius: 16px; font-size: 1.1rem; padding: 0.9rem 2rem; border: none;">
+                    📷 Open Camera
+                </button>
+            </div>
+ 
+            <form action="{{ url_for('upload') }}" method="POST" enctype="multipart/form-data" onsubmit="submitForm()">
+                <input type="hidden" name="scan_type" id="scan_type" value="plant">
+                <div class="upload-area" onclick="handleAreaClick()">
+                    <input type="file" name="file" id="file" class="file-input" accept="image/*"
+                        onchange="renderPreview(event)" required>
+ 
+                    <div id="upload-prompt">
+                        <div id="upload-icon-symbol" class="upload-icon">🌿</div>
+                        <h3 id="drop-prompt-title" style="color: #fff; font-size: 1.8rem;">Drag & Drop or Click to Upload Leaf Image</h3>
+                        <p style="color: var(--text-light); font-size: 1.1rem; margin-top: 1rem;">Supports JPG & PNG</p>
+                    </div>
+
+                    <div id="camera-container" style="display: none; position: relative; width: 100%; border-radius: 16px; overflow: hidden; background: #000; box-shadow: 0 10px 30px rgba(0,0,0,0.6);">
+                        <video id="camera-stream" autoplay playsinline style="width: 100%; max-height: 400px; display: block; object-fit: cover;"></video>
+                        <div style="position: absolute; bottom: 1.5rem; left: 0; right: 0; display: flex; justify-content: center; gap: 1rem; z-index: 10;">
+                            <button type="button" class="btn-primary" onclick="capturePhoto(event)" style="border-radius: 12px; font-size: 1rem; padding: 0.7rem 1.5rem; background: linear-gradient(135deg, var(--primary), var(--primary-glow)); color: #000; border: none; cursor: pointer;">📸 Capture</button>
+                            <button type="button" class="btn-primary" onclick="stopCamera(event)" style="background: rgba(239, 68, 68, 0.85); color: #fff; border-radius: 12px; font-size: 1rem; padding: 0.7rem 1.5rem; border: none; cursor: pointer;">❌ Close</button>
+                        </div>
+                    </div>
+
+                    <div id="preview-container">
+                        <img id="image-preview" src="#" alt="Preview">
+                        <p style="color: var(--primary); font-weight: 600; font-size: 1.2rem;">Scan Profile Loaded. Click to change image.</p>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn-primary" id="submitBtn"
+                    style="display: none; width: 100%; border-radius: 16px; font-size: 1.4rem; padding: 1.2rem;">Initialize
+                    Deep Scan</button>
+
+                <div class="loader-wrapper" id="loader">
+                    <h3
+                        style="color: var(--primary); font-family: 'Space Grotesk'; font-size: 1.4rem; letter-spacing: 2px;">
+                        PROCESSING TENSORS...</h3>
+                    <div class="ai-scan-line">
+                        <div class="ai-scan-fill"></div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </main>
+
+    <script src="{{ url_for('static', filename='leaves.js') }}"></script>
+</body>
+
+</html>

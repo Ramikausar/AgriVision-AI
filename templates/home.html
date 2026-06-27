@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AgriVision - Disease Detection</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;800&family=Space+Grotesk:wght@500;700&display=swap"
+        rel="stylesheet">
+</head>
+
+<body>
+
+    <nav class="animate-up">
+        <a href="{{ url_for('home') }}" class="logo agrivision-logo-link" style="text-decoration: none; display: flex; align-items: center; gap: 0.6rem;">
+            <span class="logo-img-wrapper">
+                <img src="{{ url_for('static', filename='Main_Logo.png') }}" alt="AgriVision Logo" class="logo-img">
+            </span>
+            <span class="agrivision-brand">Agri<span class="agrivision-accent">Vision</span></span>
+        </a>
+        <ul class="nav-links">
+            <li><a href="{{ url_for('home') }}" class="active">Home</a></li>
+            <li><a href="{{ url_for('team') }}">About Us</a></li>
+            <li><a href="{{ url_for('map_page') }}">Crop Map</a></li>
+            <li><a href="{{ url_for('upload') }}">Diagnose</a></li>
+        </ul>
+        <a href="{{ url_for('upload') }}" class="btn-primary">Try Now</a>
+    </nav>
+
+    <main>
+        <section class="hero animate-up delay-1">
+            <h1>Transform Your Crops with <br><span class="glow-text">AI Driven Precision</span></h1>
+            <p>Ensure your agricultural yield reaches its maximum potential. Upload a photo of any plant leaf and
+                instantly diagnose over 38 distinct diseases with up to 95% accuracy, powered by state-of-the-art
+                MobileNetV2 architecture.</p>
+            <a href="{{ url_for('upload') }}" class="btn-primary"
+                style="padding: 1.2rem 3rem; font-size: 1.2rem; margin-top: 1rem;">Start Free Diagnosis</a>
+
+            <div class="stats delay-2">
+                <div class="stat-card">
+                    <div class="stat-number">38+</div>
+                    <div class="stat-label">Disease Classes</div>
+                </div>
+                <div class="stat-card delay-3">
+                    <div class="stat-number glow-text">95%</div>
+                    <div class="stat-label">Model Accuracy</div>
+                </div>
+                <div class="stat-card delay-4">
+                    <div class="stat-number">7-8S</div>
+                    <div class="stat-label">Response Time</div>
+                </div>
+            </div>
+        </section>
+
+        <section class="content-section animate-up delay-3">
+            <div class="grid-2">
+                <div>
+                    <h2 class="section-title" style="text-align: left; margin-bottom: 2rem;">How It <span
+                            class="glow-text">Works</span></h2>
+                    <ul class="feature-list">
+                        <li class="feature-item">
+                            <div class="feature-icon">📸</div>
+                            <div>
+                                <h3 style="color: var(--text-main); margin-bottom: 0.5rem; font-size: 1.3rem;">Capture
+                                    Image</h3>
+                                <p style="color: var(--text-light); line-height: 1.6;">Take a clear, focused picture of
+                                    an affected leaf. Ensure good lighting for maximum AI accuracy.</p>
+                            </div>
+                        </li>
+                        <li class="feature-item">
+                            <div class="feature-icon">🧠</div>
+                            <div>
+                                <h3 style="color: var(--text-main); margin-bottom: 0.5rem; font-size: 1.3rem;">AI
+                                    Processing</h3>
+                                <p style="color: var(--text-light); line-height: 1.6;">Our Flask backend resizes the
+                                    image to 224x224 and feeds it through our fine-tuned MobileNetV2 Transfer Learning
+                                    Model.</p>
+                            </div>
+                        </li>
+                        <li class="feature-item">
+                            <div class="feature-icon">🌱</div>
+                            <div>
+                                <h3 style="color: var(--text-main); margin-bottom: 0.5rem; font-size: 1.3rem;">Get
+                                    Recommendations</h3>
+                                <p style="color: var(--text-light); line-height: 1.6;">Receive an instant classification
+                                    with a confidence score and scientifically backed care recommendations to heal your
+                                    plant.</p>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+                <div
+                    style="background: rgba(16, 185, 129, 0.05); padding: 3rem; border-radius: 32px; border: 1px solid rgba(16, 185, 129, 0.2); box-shadow: inset 0 0 50px rgba(16, 185, 129, 0.05);">
+                    <h3 style="font-size: 2rem; color: var(--text-main); margin-bottom: 1.5rem;">Supported Plants</h3>
+                    <p style="color: var(--text-light); line-height: 1.8; margin-bottom: 2rem; font-size: 1.1rem;">
+                        Our exhaustive dataset (87,000+ images) supports:
+                    </p>
+                    <div style="display: flex; flex-wrap: wrap; gap: 1rem;">
+                        <span
+                            style="background: rgba(255,255,255,0.05); padding: 0.5rem 1rem; border-radius: 20px; color: var(--text-main); border: 1px solid rgba(255,255,255,0.1);">🍎
+                            Apple</span>
+                        <span
+                            style="background: rgba(255,255,255,0.05); padding: 0.5rem 1rem; border-radius: 20px; color: var(--text-main); border: 1px solid rgba(255,255,255,0.1);">🫐
+                            Blueberry</span>
+                        <span
+                            style="background: rgba(255,255,255,0.05); padding: 0.5rem 1rem; border-radius: 20px; color: var(--text-main); border: 1px solid rgba(255,255,255,0.1);">🍒
+                            Cherry</span>
+                        <span
+                            style="background: rgba(255,255,255,0.05); padding: 0.5rem 1rem; border-radius: 20px; color: var(--text-main); border: 1px solid rgba(255,255,255,0.1);">🌽
+                            Corn</span>
+                        <span
+                            style="background: rgba(255,255,255,0.05); padding: 0.5rem 1rem; border-radius: 20px; color: var(--text-main); border: 1px solid rgba(255,255,255,0.1);">🍇
+                            Grape</span>
+                        <span
+                            style="background: rgba(255,255,255,0.05); padding: 0.5rem 1rem; border-radius: 20px; color: var(--text-main); border: 1px solid rgba(255,255,255,0.1);">🍊
+                            Orange</span>
+                        <span
+                            style="background: rgba(255,255,255,0.05); padding: 0.5rem 1rem; border-radius: 20px; color: var(--text-main); border: 1px solid rgba(255,255,255,0.1);">🍑
+                            Peach</span>
+                        <span
+                            style="background: rgba(255,255,255,0.05); padding: 0.5rem 1rem; border-radius: 20px; color: var(--text-main); border: 1px solid rgba(255,255,255,0.1);">🫑
+                            Pepper</span>
+                        <span
+                            style="background: rgba(255,255,255,0.05); padding: 0.5rem 1rem; border-radius: 20px; color: var(--text-main); border: 1px solid rgba(255,255,255,0.1);">🥔
+                            Potato</span>
+                        <span
+                            style="background: rgba(255,255,255,0.05); padding: 0.5rem 1rem; border-radius: 20px; color: var(--text-main); border: 1px solid rgba(255,255,255,0.1);">🍅
+                            Tomato</span>
+                        <span
+                            style="background: rgba(255,255,255,0.05); padding: 0.5rem 1rem; border-radius: 20px; color: var(--text-main); border: 1px solid rgba(255,255,255,0.1);">🍓
+                            Strawberry</span>
+                        <span
+                            style="background: rgba(255,255,255,0.05); padding: 0.5rem 1rem; border-radius: 20px; color: var(--text-main); border: 1px solid rgba(255,255,255,0.1);">🌿
+                            Raspberry</span>
+                        <span
+                            style="background: rgba(255,255,255,0.05); padding: 0.5rem 1rem; border-radius: 20px; color: var(--text-main); border: 1px solid rgba(255,255,255,0.1);">🌱
+                            Soybean</span>
+                        <span
+                            style="background: rgba(255,255,255,0.05); padding: 0.5rem 1rem; border-radius: 20px; color: var(--text-main); border: 1px solid rgba(255,255,255,0.1);">🌿
+                            Squash</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer
+        style="text-align: center; padding: 4rem 5%; color: var(--text-light); border-top: 1px solid rgba(255,255,255,0.05); margin-top: 4rem;">
+        <p>© 2026 AgriVision. Engineered for Agricultural Excellence.</p>
+    </footer>
+
+    <script src="{{ url_for('static', filename='leaves.js') }}"></script>
+</body>
+
+</html>
