@@ -37,12 +37,11 @@
             <span class="agrivision-brand">Agri<span class="agrivision-accent">Vision</span></span>
         </a>
         <ul class="nav-links">
-            <li><a href="{{ url_for('home') }}" class="active">Home</a></li>
+            <li><a href="{{ url_for('home') }}">Home</a></li>
             <li><a href="{{ url_for('team') }}">About Us</a></li>
             <li><a href="{{ url_for('map_page') }}">Crop Map</a></li>
-            <li><a href="{{ url_for('upload') }}">Diagnose</a></li>
+            <li><a href="{{ url_for('upload') }}" class="active">Diagnose</a></li>
         </ul>
-        <a href="{{ url_for('upload') }}" class="btn-primary">Try Now</a>
     </nav>
 
     <main>
