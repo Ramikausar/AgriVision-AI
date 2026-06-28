@@ -57,7 +57,6 @@ The system focuses on:
 
 ## 🏗 System Architecture
 
-## 🏗 System Architecture
 
 ```text
 Upload Plant Image
