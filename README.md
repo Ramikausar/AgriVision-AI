@@ -8,7 +8,7 @@
 
 AgriVision is a farmer-focused application designed to help users identify plant diseases quickly using image analysis and provide useful information to support crop management decisions.
 
-Developed as an academic project at **Ganpat University**, the platform aims to make plant disease identification simple, accessible, and practical.
+Developed as an academic project at Ganpat University, the platform aims to make plant disease identification simple, accessible, and practical.
 
 ---
 
@@ -57,16 +57,21 @@ The system focuses on:
 
 ## 🏗 System Architecture
 
-```mermaid
-flowchart TD
-A[Upload Plant Image]
---> B[Flask Backend]
---> C[Image Processing]
---> D[Kindwise API]
---> E[Disease Information]
---> F[Display Results]
-```
+## 🏗 System Architecture
 
+```text
+Upload Plant Image
+        ↓
+Flask Backend
+        ↓
+Image Processing
+        ↓
+Kindwise Plant Disease API
+        ↓
+Disease Information
+        ↓
+Display Results
+```
 ---
 
 ## 📂 Folder Structure
@@ -154,7 +159,7 @@ http://127.0.0.1:5000
 
 ## 🔌 API Integration
 
-* **Kindwise Plant Disease API— Used for plant disease identification and disease information retrieval.
+* Kindwise Plant Disease API— Used for plant disease identification and disease information retrieval.
 
 ---
 
@@ -174,7 +179,7 @@ python-dotenv
 
 ## 🚀 Deployment
 
-The application is deployed using **Render**.
+The application is deployed using Render.
 
 > ⚠️ The service may take a minute to start if it has been inactive for some time. This is due to free hosting limitations and only affects the first request.
 
@@ -182,7 +187,7 @@ The application is deployed using **Render**.
 
 ## 🎥 Demo
 
-🌐 **Live Demo:TODO: Add your Render URL here
+🌐 Live Demo: https://agrivision-ai-ig60.onrender.com/
 
 ---
 
@@ -203,8 +208,8 @@ The application is deployed using **Render**.
 
 ## 👥 Team Members
 
-* **Aryan Ponkiya
-* **Kausar Rami**
+* Aryan Ponkiya                                                📩 aryanpatel09395@gmail.com
+* Kausar Rami                                                  📩 ramikausar@gmail.com
 
 ---
 
