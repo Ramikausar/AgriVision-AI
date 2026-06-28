@@ -4,10 +4,12 @@ import requests
 from pathlib import Path
 from dotenv import load_dotenv
 
-load_dotenv()
 
+def api():
+        load_dotenv()
+api()
 # API Key - read from .env, fallback to hardcoded
-API_KEY = os.environ.get('PLANT_ID_API_KEY' )
+API_KEY = os.getenv('PLANT_ID_API_KEY')
 
 # Correct endpoint with disease details requested
 API_URL = "https://api.plant.id/v3/identification"
